@@ -1,0 +1,86 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JournalMobile.Pages.StudentPage"
+             BackgroundColor="#CFE3FA"
+             Title="Главная">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="24">
+
+            <Label Text="Здравствуйте!"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="Black"
+                   HorizontalTextAlignment="Center" />
+
+            <Label Text="Главная"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   TextColor="Black" />
+
+            <VerticalStackLayout Spacing="14">
+
+                <Frame CornerRadius="22" Padding="18" BackgroundColor="#AFC7FF" HasShadow="False">
+                    <Grid ColumnDefinitions="60,*">
+                        <Label Text="📅" FontSize="34" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Расписание" FontSize="20" FontAttributes="Bold" TextColor="Black" />
+                            <Label Text="Посмотреть пары" TextColor="#333333" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnScheduleClicked" />
+                    </Frame.GestureRecognizers>
+                </Frame>
+
+                <Frame CornerRadius="22" Padding="18" BackgroundColor="#6F93E8" HasShadow="False">
+                    <Grid ColumnDefinitions="60,*">
+                        <Label Text="📝" FontSize="34" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Оценки" FontSize="20" FontAttributes="Bold" TextColor="Black" />
+                            <Label Text="Посмотреть успеваемость" TextColor="#333333" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnGradesClicked" />
+                    </Frame.GestureRecognizers>
+                </Frame>
+
+                <Frame CornerRadius="22" Padding="18" BackgroundColor="#8B45C9" HasShadow="False">
+                    <Grid ColumnDefinitions="60,*">
+                        <Label Text="✅" FontSize="34" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Посещаемость" FontSize="20" FontAttributes="Bold" TextColor="Black" />
+                            <Label Text="Отметки посещения" TextColor="#333333" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAttendanceClicked" />
+                    </Frame.GestureRecognizers>
+                </Frame>
+
+            </VerticalStackLayout>
+
+            <Label Text="Сегодня"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   TextColor="Black" />
+
+            <Frame CornerRadius="22"
+                   Padding="18"
+                   BackgroundColor="#EAF3FF"
+                   HasShadow="False">
+
+                <Label x:Name="TodayScheduleLabel"
+                       Text="Расписание на сегодня загрузится здесь"
+                       TextColor="Black"
+                       FontSize="16" />
+            </Frame>
+
+            <Label x:Name="ResultLabel"
+                   TextColor="{AppThemeBinding Light=Black, Dark=White}"
+                   FontSize="16" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

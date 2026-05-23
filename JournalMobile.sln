@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JournalMobile", "JournalMobile\JournalMobile.csproj", "{9090BA39-2F32-49EF-918F-7D2ED9527C36}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9090BA39-2F32-49EF-918F-7D2ED9527C36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9090BA39-2F32-49EF-918F-7D2ED9527C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9090BA39-2F32-49EF-918F-7D2ED9527C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9090BA39-2F32-49EF-918F-7D2ED9527C36}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {165669AB-3873-4C66-9065-C7B6B2992D63}
+	EndGlobalSection
+EndGlobal
