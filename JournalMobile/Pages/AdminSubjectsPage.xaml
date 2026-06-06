@@ -1,0 +1,51 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JournalMobile.Pages.AdminSubjectsPage"
+             BackgroundColor="#CFE3FA"
+             Title="Пользователи">
+
+    <VerticalStackLayout Padding="20"
+                         Spacing="15">
+
+        <Label Text="Предметы"
+               FontSize="30"
+               FontAttributes="Bold"/>
+
+        <Button Text="Добавить предмет"
+                Clicked="OnAddSubjectClicked"
+                BackgroundColor="#7DA8F7"
+                TextColor="Black"/>
+
+        <CollectionView x:Name="SubjectsCollection">
+
+            <CollectionView.ItemTemplate>
+
+                <DataTemplate>
+
+                    <Border BackgroundColor="#EAF3FF"
+                            Padding="15"
+                            Margin="0,5">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                            Tapped="OnSubjectTapped" />
+                        </Border.GestureRecognizers>
+
+                        <VerticalStackLayout>
+
+                            <Label Text="{Binding Name}"
+                                   FontAttributes="Bold"
+                                   FontSize="18"/>
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+                </DataTemplate>
+
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </VerticalStackLayout>
+
+</ContentPage>

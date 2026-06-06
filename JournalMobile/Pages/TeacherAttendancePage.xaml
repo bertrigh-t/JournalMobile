@@ -1,14 +1,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="JournalMobile.Pages.TeacherGradesPage"
+             x:Class="JournalMobile.Pages.TeacherAttendancePage"
              BackgroundColor="#CFE3FA"
-             Title="Журнал оценок">
+             Title="Посещаемость">
 
     <ScrollView>
 
-        <VerticalStackLayout Padding="20" Spacing="16">
+        <VerticalStackLayout Padding="20"
+                             Spacing="16">
 
-            <Label Text="Журнал оценок"
+            <Label Text="Журнал посещаемости"
                    FontSize="30"
                    FontAttributes="Bold"
                    TextColor="Black" />
@@ -29,10 +30,13 @@
                             SelectedIndexChanged="OnGroupChanged"
                             BackgroundColor="White"
                             TextColor="Black" />
+
                     <Picker x:Name="SemesterPicker"
                             Title="Выберите семестр"
                             SelectedIndexChanged="OnSemesterChanged"
-                            Margin="0,10,0,0"/>
+                            Margin="0,10,0,0"
+                            BackgroundColor="White"
+                            TextColor="Black" />
 
                     <Picker x:Name="JournalPicker"
                             Title="Выберите предмет"
@@ -43,21 +47,24 @@
                 </VerticalStackLayout>
 
             </Border>
+
             <Button Text="Добавить дату"
-        Clicked="OnAddDateClicked"
-        BackgroundColor="#7DA8F7"
-        TextColor="Black"
-        CornerRadius="12"
-        HeightRequest="45" />
+                    Clicked="OnAddDateClicked"
+                    BackgroundColor="#7DA8F7"
+                    TextColor="Black"
+                    CornerRadius="12"
+                    HeightRequest="45" />
+
             <Button Text="Экспорт в PDF"
-        Clicked="OnExportPdfClicked"
-        BackgroundColor="#5E8DF5"
-        TextColor="White"
-        CornerRadius="12"
-        HeightRequest="45" />
+                    Clicked="OnExportPdfClicked"
+                    BackgroundColor="#5E8DF5"
+                    TextColor="White"
+                    CornerRadius="12"
+                    HeightRequest="45" />
+
             <ScrollView Orientation="Horizontal">
 
-                <Grid x:Name="GradesTable"
+                <Grid x:Name="AttendanceTable"
                       RowSpacing="1"
                       ColumnSpacing="1"
                       BackgroundColor="#B7C9DD" />

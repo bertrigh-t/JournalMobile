@@ -49,12 +49,24 @@ public partial class TeacherPage : ContentPage
     {
         await Navigation.PushAsync(new TeacherGradesPage());
     }
+
+    private async void OnAttendanceStudentsClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new TeacherAttendancePage());
+    }
+
+
     private string FormatDate(string date)
     {
         if (DateTime.TryParse(date, out var parsedDate))
             return parsedDate.ToString("dd.MM.yyyy");
 
         return date;
+    }
+
+    private void Button_Clicked(object sender, EventArgs e)
+    {
+
     }
 }
 

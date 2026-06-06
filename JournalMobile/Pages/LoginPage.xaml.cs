@@ -77,6 +77,10 @@ public partial class LoginPage : ContentPage
             {
                 await Navigation.PushAsync(new TeacherPage());
             }
+            else if (loginResponse.Role == "admin")
+            {
+                await Navigation.PushAsync(new AdminPage());
+            }
             else
             {
                 await DisplayAlert("Ошибка", "Неизвестная роль: " + loginResponse.Role, "OK");

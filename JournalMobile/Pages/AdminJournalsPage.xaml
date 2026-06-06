@@ -1,0 +1,81 @@
+<ContentPage
+    x:Class="JournalMobile.Pages.AdminJournalsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Управление журналами"
+    BackgroundColor="#F4F6FB">
+
+    <ScrollView>
+
+        <VerticalStackLayout
+            Padding="20"
+            Spacing="18">
+
+            <Label
+                Text="Создание журнала"
+                FontSize="28"
+                FontAttributes="Bold"
+                TextColor="#1E293B" />
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#D6E0F5"
+                StrokeShape="RoundRectangle 18"
+                Padding="18">
+
+                <VerticalStackLayout Spacing="16">
+
+                    <Label
+                        Text="Группа"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+
+                    <Picker
+                        x:Name="GroupPicker"
+                        Title="Выберите группу"
+                        BackgroundColor="#F8FAFC"
+                        TextColor="Black" />
+
+                    <Label
+                        Text="Предмет"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+
+                    <Picker
+                        x:Name="SubjectPicker"
+                        Title="Выберите предмет"
+                        BackgroundColor="#F8FAFC"
+                        TextColor="Black" />
+
+                    <Label
+                        Text="Преподаватель"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+
+                    <Picker
+                        x:Name="TeacherPicker"
+                        Title="Выберите преподавателя"
+                        BackgroundColor="#F8FAFC"
+                        TextColor="Black" />
+
+                    <Button
+                        Text="Создать журнал"
+                        HeightRequest="52"
+                        CornerRadius="14"
+                        BackgroundColor="#4F46E5"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        Clicked="OnCreateJournalClicked" />
+
+                </VerticalStackLayout>
+
+            </Border>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
+
+</ContentPage>

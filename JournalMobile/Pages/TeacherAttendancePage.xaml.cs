@@ -7,13 +7,13 @@ using System.Text.Json;
 
 namespace JournalMobile.Pages;
 
-public partial class TeacherGradesPage : ContentPage
+public partial class TeacherAttendancePage : ContentPage
 {
     private readonly HttpClient _httpClient = new();
 
-    private List<GroupItem> _groups = new();
-    private List<JournalItem> _journals = new();
-    private List<SemesterItem> _semesters = new();
+    private List<GroupAttendanceItem> _groups = new();
+    private List<JournalAttendanceItem> _journals = new();
+    private List<SemesterAttendanceItem> _semesters = new();
     private List<StudentItem> _students = new();
     private List<string> _dates = new();
 
@@ -21,7 +21,7 @@ public partial class TeacherGradesPage : ContentPage
     private int _selectedJournalId;
     private int _selectedSemesterId;
 
-    public TeacherGradesPage()
+    public TeacherAttendancePage()
     {
         InitializeComponent();
 
@@ -41,7 +41,7 @@ public partial class TeacherGradesPage : ContentPage
         {
             GroupPicker.Items.Clear();
             JournalPicker.Items.Clear();
-            GradesTable.Children.Clear();
+            AttendanceTable.Children.Clear();
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
@@ -60,10 +60,10 @@ public partial class TeacherGradesPage : ContentPage
                 return;
             }
 
-            _groups = JsonSerializer.Deserialize<List<GroupItem>>(
+            _groups = JsonSerializer.Deserialize<List<GroupAttendanceItem>>(
                 json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? new List<GroupItem>();
+            ) ?? new List<GroupAttendanceItem>();
 
             foreach (var group in _groups)
                 GroupPicker.Items.Add(group.Name);
@@ -107,7 +107,7 @@ public partial class TeacherGradesPage : ContentPage
                 return;
             }
 
-            _semesters = JsonSerializer.Deserialize<List<SemesterItem>>(
+            _semesters = JsonSerializer.Deserialize<List<SemesterAttendanceItem>>(
                 json,
                 new JsonSerializerOptions
                 {
@@ -195,7 +195,7 @@ public partial class TeacherGradesPage : ContentPage
         try
         {
             JournalPicker.Items.Clear();
-            GradesTable.Children.Clear();
+            AttendanceTable.Children.Clear();
             _journals.Clear();
             _selectedJournalId = 0;
 
@@ -216,10 +216,10 @@ public partial class TeacherGradesPage : ContentPage
                 return;
             }
 
-            _journals = JsonSerializer.Deserialize<List<JournalItem>>(
+            _journals = JsonSerializer.Deserialize<List<JournalAttendanceItem>>(
                 json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? new List<JournalItem>();
+            ) ?? new List<JournalAttendanceItem>();
 
             foreach (var journal in _journals)
                 JournalPicker.Items.Add(journal.Subject);
@@ -243,23 +243,23 @@ public partial class TeacherGradesPage : ContentPage
         var journal = _journals[JournalPicker.SelectedIndex];
         _selectedJournalId = journal.Id;
 
-        await LoadGrades();
+        await LoadAttendance();
     }
 
-    private async Task LoadGrades()
+    private async Task LoadAttendance()
     {
         if (_selectedJournalId <= 0)
             return;
 
         try
         {
-            GradesTable.Children.Clear();
-            GradesTable.RowDefinitions.Clear();
-            GradesTable.ColumnDefinitions.Clear();
+            AttendanceTable.Children.Clear();
+            AttendanceTable.RowDefinitions.Clear();
+            AttendanceTable.ColumnDefinitions.Clear();
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                $"https://localhost:7070/Grades/journal/{_selectedJournalId}"
+                $"https://localhost:7070/Attendance/journal/{_selectedJournalId}"
             );
 
             request.Headers.Authorization =
@@ -270,16 +270,16 @@ public partial class TeacherGradesPage : ContentPage
 
             if (!response.IsSuccessStatusCode)
             {
-                await DisplayAlert("Ошибка оценок", $"{response.StatusCode}\n{json}", "OK");
+                await DisplayAlert("Ошибка посещаемости", $"{response.StatusCode}\n{json}", "OK");
                 return;
             }
 
-            var grades = JsonSerializer.Deserialize<List<TeacherGradeItem>>(
+            var attendance = JsonSerializer.Deserialize<List<TeacherAttendanceItem>>(
                 json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? new List<TeacherGradeItem>();
+            ) ?? new List<TeacherAttendanceItem>();
 
-            BuildGradesTable(grades);
+            BuildAttendanceTable(attendance);
         }
         catch (Exception ex)
         {
@@ -290,18 +290,18 @@ public partial class TeacherGradesPage : ContentPage
     {
         try
         {
-            var gradesRequest = new HttpRequestMessage(
+            var attendanceRequest = new HttpRequestMessage(
                 HttpMethod.Get,
-                $"https://localhost:7070/Grades/journal/{_selectedJournalId}"
+                $"https://localhost:7070/attendance/journal/{_selectedJournalId}"
             );
 
-            gradesRequest.Headers.Authorization =
+            attendanceRequest.Headers.Authorization =
                 new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-            var response = await _httpClient.SendAsync(gradesRequest);
+            var response = await _httpClient.SendAsync(attendanceRequest);
             var json = await response.Content.ReadAsStringAsync();
 
-            var grades = JsonSerializer.Deserialize<List<TeacherGradeItem>>(
+            var attendances = JsonSerializer.Deserialize<List<TeacherAttendanceItem>>(
                 json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             ) ?? new();
@@ -317,17 +317,17 @@ public partial class TeacherGradesPage : ContentPage
             string downloadsPath;
 
 #if ANDROID
-downloadsPath = Android.OS.Environment
-    .GetExternalStoragePublicDirectory(
-        Android.OS.Environment.DirectoryDownloads
-    )!
-    .AbsolutePath;
+            downloadsPath = Android.OS.Environment
+                .GetExternalStoragePublicDirectory(
+                    Android.OS.Environment.DirectoryDownloads
+                )!
+                .AbsolutePath;
 #else
             downloadsPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 "Downloads"
             );
-            #endif
+#endif
 
             string filePath = Path.Combine(downloadsPath, "journal.pdf");
             Document.Create(container =>
@@ -337,7 +337,7 @@ downloadsPath = Android.OS.Environment
                     page.Margin(20);
 
                     page.Header()
-                        .Text("Журнал оценок")
+                        .Text("Журнал посещаемости")
                         .FontSize(24)
                         .Bold();
 
@@ -378,13 +378,17 @@ downloadsPath = Android.OS.Environment
 
                                 foreach (var date in dates)
                                 {
-                                    var grade = grades.FirstOrDefault(g =>
+                                    var attendance = attendances.FirstOrDefault(g =>
                                         g.Student == student.Name &&
                                         g.Date == date);
 
                                     table.Cell().Border(1).Padding(5)
                                         .AlignCenter()
-                                        .Text(grade?.Grade.ToString() ?? "-");
+                                        .Text(
+                                            attendance == null
+                                                ? "-"
+                                                : GetStatusText(attendance.Status)
+                                        );
                                 }
                             }
                         });
@@ -410,11 +414,11 @@ downloadsPath = Android.OS.Environment
         }
     }
 
-    private void BuildGradesTable(List<TeacherGradeItem> grades)
+    private void BuildAttendanceTable(List<TeacherAttendanceItem> attendances)
     {
-        GradesTable.Children.Clear();
-        GradesTable.RowDefinitions.Clear();
-        GradesTable.ColumnDefinitions.Clear();
+        AttendanceTable.Children.Clear();
+        AttendanceTable.RowDefinitions.Clear();
+        AttendanceTable.ColumnDefinitions.Clear();
 
         var students = _students
             .OrderBy(s => s.Name)
@@ -422,7 +426,7 @@ downloadsPath = Android.OS.Environment
 
         if (_dates.Count == 0)
         {
-            _dates = grades
+            _dates = attendances
                 .Select(g => g.Date)
                 .Distinct()
                 .OrderBy(d => d)
@@ -430,8 +434,8 @@ downloadsPath = Android.OS.Environment
         }
         if (students.Count == 0)
         {
-            GradesTable.RowDefinitions.Add(new RowDefinition { Height = 45 });
-            GradesTable.ColumnDefinitions.Add(new ColumnDefinition { Width = 260 });
+            AttendanceTable.RowDefinitions.Add(new RowDefinition { Height = 45 });
+            AttendanceTable.ColumnDefinitions.Add(new ColumnDefinition { Width = 260 });
             AddCell("Студенты не найдены", 0, 0, true);
             return;
         }
@@ -441,12 +445,12 @@ downloadsPath = Android.OS.Environment
             _dates.Add(DateTime.Now.ToString("yyyy-MM-dd"));
         }
 
-        GradesTable.ColumnDefinitions.Add(new ColumnDefinition { Width = 150 });
+        AttendanceTable.ColumnDefinitions.Add(new ColumnDefinition { Width = 150 });
 
         foreach (var date in _dates)
-            GradesTable.ColumnDefinitions.Add(new ColumnDefinition { Width = 80 });
+            AttendanceTable.ColumnDefinitions.Add(new ColumnDefinition { Width = 80 });
 
-        GradesTable.RowDefinitions.Add(new RowDefinition { Height = 48 });
+        AttendanceTable.RowDefinitions.Add(new RowDefinition { Height = 48 });
 
         AddCell("Студент", 0, 0, true);
 
@@ -455,7 +459,7 @@ downloadsPath = Android.OS.Environment
 
         for (int row = 0; row < students.Count; row++)
         {
-            GradesTable.RowDefinitions.Add(new RowDefinition { Height = 48 });
+            AttendanceTable.RowDefinitions.Add(new RowDefinition { Height = 48 });
 
             var student = students[row];
 
@@ -465,14 +469,14 @@ downloadsPath = Android.OS.Environment
             {
                 var date = _dates[col];
 
-                var grade = grades.FirstOrDefault(g =>
+                var attendance = attendances.FirstOrDefault(g =>
                     g.Student == student.Name &&
                     g.Date == date);
 
-                if (grade == null)
-                    AddEmptyGradeCell(student.Id, date, col + 1, row + 1);
+                if (attendance == null)
+                    AddEmptyAttendanceCell(student.Id, date, col + 1, row + 1);
                 else
-                    AddGradeCell(grade, col + 1, row + 1);
+                    AddAttendanceCell(attendance, col + 1, row + 1);
             }
         }
     }
@@ -500,10 +504,10 @@ downloadsPath = Android.OS.Environment
         Grid.SetColumn(border, column);
         Grid.SetRow(border, row);
 
-        GradesTable.Children.Add(border);
+        AttendanceTable.Children.Add(border);
     }
 
-    private void AddEmptyGradeCell(int studentId, string date, int column, int row)
+    private void AddEmptyAttendanceCell(int studentId, string date, int column, int row)
     {
         var border = new Border
         {
@@ -524,7 +528,7 @@ downloadsPath = Android.OS.Environment
         var tap = new TapGestureRecognizer();
         tap.Tapped += async (s, e) =>
         {
-            await AddGrade(studentId, date);
+            await AddAttendance(studentId, date);
         };
 
         border.GestureRecognizers.Add(tap);
@@ -532,20 +536,20 @@ downloadsPath = Android.OS.Environment
         Grid.SetColumn(border, column);
         Grid.SetRow(border, row);
 
-        GradesTable.Children.Add(border);
+        AttendanceTable.Children.Add(border);
     }
 
-    private void AddGradeCell(TeacherGradeItem grade, int column, int row)
+    private void AddAttendanceCell(TeacherAttendanceItem attendance, int column, int row)
     {
         var border = new Border
         {
-            BackgroundColor = grade.GradeColor,
+            BackgroundColor = attendance.StatusColor,
             Stroke = Microsoft.Maui.Graphics.Color.FromArgb("#B7C9DD"),
             StrokeThickness = 1,
             Padding = 8,
             Content = new Label
             {
-                Text = grade.Grade.ToString(),
+                Text = GetStatusText(attendance.Status).ToString(),
                 TextColor = Colors.White,
                 FontAttributes = FontAttributes.Bold,
                 HorizontalTextAlignment = TextAlignment.Center,
@@ -556,7 +560,7 @@ downloadsPath = Android.OS.Environment
         var tap = new TapGestureRecognizer();
         tap.Tapped += async (s, e) =>
         {
-            await EditGrade(grade);
+            await EditAttendance(attendance);
         };
 
         border.GestureRecognizers.Add(tap);
@@ -564,38 +568,43 @@ downloadsPath = Android.OS.Environment
         Grid.SetColumn(border, column);
         Grid.SetRow(border, row);
 
-        GradesTable.Children.Add(border);
+        AttendanceTable.Children.Add(border);
     }
 
-    private async Task AddGrade(int studentId, string date)
+    private async Task AddAttendance(int studentId, string date)
     {
-        var result = await DisplayPromptAsync(
-            "Добавление оценки",
-            "Введите оценку:",
-            maxLength: 1,
-            keyboard: Keyboard.Numeric
+        var selected = await DisplayActionSheet(
+            "Выберите статус",
+            "Отмена",
+            null,
+            "Присутствовал",
+            "Отсутствовал",
+            "Опоздал",
+            "Уважительная причина"
         );
 
-        if (string.IsNullOrWhiteSpace(result))
+        if (string.IsNullOrWhiteSpace(selected) || selected == "Отмена")
             return;
 
-        if (!int.TryParse(result, out int grade) || grade < 2 || grade > 5)
+        string status = selected switch
         {
-            await DisplayAlert("Ошибка", "Введите оценку от 2 до 5", "OK");
-            return;
-        }
-
+            "Присутствовал" => "present",
+            "Отсутствовал" => "absent",
+            "Опоздал" => "late",
+            "Уважительная причина" => "excused",
+            _ => ""
+        };
         var requestData = new
         {
             studentId,
             journalId = _selectedJournalId,
-            grade,
+            status,
             date
         };
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
-            "https://localhost:7070/Grades"
+            "https://localhost:7070/Attendance"
         );
 
         request.Headers.Authorization =
@@ -612,48 +621,55 @@ downloadsPath = Android.OS.Environment
 
         if (!response.IsSuccessStatusCode)
         {
-            await DisplayAlert("Ошибка добавления", $"{response.StatusCode}\n{json}", "OK");
+            await DisplayAlert(
+                "Ошибка добавления",
+                $"{response.StatusCode}\n{json}",
+                "OK"
+            );
             return;
         }
 
-        await LoadGrades();
+        await LoadAttendance();
     }
-
-    private async Task EditGrade(TeacherGradeItem grade)
+    private async Task EditAttendance(TeacherAttendanceItem attendance)
     {
-        var result = await DisplayPromptAsync(
-            "Изменение оценки",
-            $"{grade.Student}\nТекущая оценка: {grade.Grade}\nВведите новую оценку:",
-            initialValue: grade.Grade.ToString(),
-            maxLength: 1,
-            keyboard: Keyboard.Numeric
+        var selected = await DisplayActionSheet(
+            $"Статус для {attendance.Student}",
+            "Отмена",
+            null,
+            "Присутствовал",
+            "Отсутствовал",
+            "Опоздал",
+            "Уважительная причина"
         );
 
-        if (string.IsNullOrWhiteSpace(result))
+        if (string.IsNullOrWhiteSpace(selected) || selected == "Отмена")
             return;
 
-        if (!int.TryParse(result, out int newGrade) || newGrade < 2 || newGrade > 5)
+        string status = selected switch
         {
-            await DisplayAlert("Ошибка", "Введите оценку от 2 до 5", "OK");
-            return;
-        }
+            "Присутствовал" => "present",
+            "Отсутствовал" => "absent",
+            "Опоздал" => "late",
+            "Уважительная причина" => "excused",
+            _ => ""
+        };
 
-        await UpdateGrade(grade.Id, newGrade);
+        await UpdateAttendance(attendance.Id, status);
     }
-
-    private async Task UpdateGrade(int id, int grade)
+    private async Task UpdateAttendance(int id, string status)
     {
         try
         {
             var requestData = new
             {
-                grade,
+                status,
                 date = DateTime.Now.ToString("yyyy-MM-dd")
             };
 
             var request = new HttpRequestMessage(
                 HttpMethod.Put,
-                $"https://localhost:7070/Grades/{id}"
+                $"https://localhost:7070/attendance/{id}"
             );
 
             request.Headers.Authorization =
@@ -674,20 +690,30 @@ downloadsPath = Android.OS.Environment
                 return;
             }
 
-            await LoadGrades();
+            await LoadAttendance();
         }
         catch (Exception ex)
         {
             await DisplayAlert("Ошибка изменения оценки", ex.Message, "OK");
         }
     }
-
     private string FormatDateShort(string date)
     {
         if (DateTime.TryParse(date, out var parsedDate))
             return parsedDate.ToString("dd.MM.yy");
 
         return date;
+    }
+    private string GetStatusText(string status)
+    {
+        return status switch
+        {
+            "present" => "Присутствовал",
+            "absent" => "Отсутствовал",
+            "late" => "Опоздал",
+            "excused" => "Уважительная причина",
+            _ => status
+        };
     }
 
     private async void OnAddDateClicked(object sender, EventArgs e)
@@ -719,22 +745,22 @@ downloadsPath = Android.OS.Environment
             .OrderBy(d => d)
             .ToList();
 
-        await LoadGrades();
+        await LoadAttendance();
     }
 }
 
-public class GroupItem
+public class GroupAttendanceItem
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";
 }
 
-public class JournalItem
+public class JournalAttendanceItem
 {
     public int Id { get; set; }
     public string Subject { get; set; } = "";
 }
-public class SemesterItem
+public class SemesterAttendanceItem
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";
@@ -742,19 +768,22 @@ public class SemesterItem
     public string Start_date { get; set; } = "";
     public string End_date { get; set; } = "";
 }
-public class TeacherGradeItem
+public class TeacherAttendanceItem
 {
     public int Id { get; set; }
+
     public string Student { get; set; } = "";
-    public int Grade { get; set; }
+
     public string Date { get; set; } = "";
 
-    public Microsoft.Maui.Graphics.Color GradeColor => Grade switch
+    public string Status { get; set; } = "";
+
+    public Microsoft.Maui.Graphics.Color StatusColor => Status switch
     {
-        5 => Microsoft.Maui.Graphics.Color.FromArgb("#8BC34A"),
-        4 => Microsoft.Maui.Graphics.Color.FromArgb("#CDDC39"),
-        3 => Microsoft.Maui.Graphics.Color.FromArgb("#FFB74D"),
-        2 => Microsoft.Maui.Graphics.Color.FromArgb("#E57373"),
+        "absent" => Microsoft.Maui.Graphics.Color.FromArgb("#E57373"),
+        "late" => Microsoft.Maui.Graphics.Color.FromArgb("#FFB74D"),
+        "excused" => Microsoft.Maui.Graphics.Color.FromArgb("#90CAF9"),
+        "present" => Microsoft.Maui.Graphics.Color.FromArgb("#8BC34A"),
         _ => Microsoft.Maui.Graphics.Colors.Gray
     };
 }
