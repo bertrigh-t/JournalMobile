@@ -3,49 +3,97 @@
              x:Class="JournalMobile.Pages.AdminSubjectsPage"
              BackgroundColor="#CFE3FA"
              Title="Пользователи">
-
-    <VerticalStackLayout Padding="20"
+    <ScrollView>
+        <VerticalStackLayout Padding="20"
                          Spacing="15">
 
-        <Label Text="Предметы"
+            <Label Text="Предметы"
                FontSize="30"
                FontAttributes="Bold"/>
 
-        <Button Text="Добавить предмет"
+            <Button Text="Добавить предмет"
                 Clicked="OnAddSubjectClicked"
                 BackgroundColor="#7DA8F7"
                 TextColor="Black"/>
 
-        <CollectionView x:Name="SubjectsCollection">
+            <CollectionView x:Name="SubjectsCollection">
 
-            <CollectionView.ItemTemplate>
+                <CollectionView.ItemTemplate>
 
-                <DataTemplate>
+                    <DataTemplate>
 
-                    <Border BackgroundColor="#EAF3FF"
+                        <Border BackgroundColor="#EAF3FF"
                             Padding="15"
                             Margin="0,5">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
                             Tapped="OnSubjectTapped" />
-                        </Border.GestureRecognizers>
+                            </Border.GestureRecognizers>
 
-                        <VerticalStackLayout>
+                            <VerticalStackLayout>
 
-                            <Label Text="{Binding Name}"
+                                <Label Text="{Binding Name}"
                                    FontAttributes="Bold"
                                    FontSize="18"/>
 
-                        </VerticalStackLayout>
+                            </VerticalStackLayout>
 
-                    </Border>
+                        </Border>
 
-                </DataTemplate>
+                    </DataTemplate>
 
-            </CollectionView.ItemTemplate>
+                </CollectionView.ItemTemplate>
 
-        </CollectionView>
+            </CollectionView>
 
-    </VerticalStackLayout>
+            <Label Text="Назначить предмет преподавателю"
+           FontSize="20"
+           FontAttributes="Bold"
+           TextColor="Black"
+           Margin="0,10,0,0" />
 
+            <Picker x:Name="TeacherPicker"
+            Title="Выберите преподавателя"
+            BackgroundColor="White"
+            TextColor="Black"
+            SelectedIndexChanged="OnTeacherChanged"/>
+
+            <Picker x:Name="AssignSubjectPicker"
+            Title="Выберите предмет"
+            BackgroundColor="White"
+            TextColor="Black"/>
+
+            <Button Text="Назначить"
+            Clicked="OnAssignSubjectClicked"
+            BackgroundColor="#5E8DF5"
+            TextColor="White"
+            CornerRadius="12"
+            HeightRequest="45"/>
+
+            <Label Text="Предметы преподавателя"
+           FontSize="18"
+           FontAttributes="Bold"
+           TextColor="Black"
+           Margin="0,10,0,0"/>
+
+            <CollectionView x:Name="TeacherSubjectsCollection"
+                    SelectionMode="Single"
+                    SelectionChanged="OnTeacherSubjectSelected">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="#EAF3FF"
+                        Stroke="#B7C9DD"
+                        StrokeThickness="1"
+                        Padding="8"
+                        Margin="0,0,0,5">
+                            <Label Text="{Binding Name}"
+                           FontSize="16"
+                           TextColor="Black"/>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+
+    </ScrollView>
 </ContentPage>
