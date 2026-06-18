@@ -1,6 +1,7 @@
 using JournalMobile.Services;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using JournalMobile.Models;
 
 namespace JournalMobile.Pages;
 
@@ -56,7 +57,7 @@ public partial class StudentSchedulePage : ContentPage
             var items = schedule.Select(s => new ScheduleDisplayItem
             {
                 DayOfWeekText = TranslateDay(s.DayOfWeek),
-                TimeSubjectClassroom = $"{s.StartTime}-{s.EndTime} | {s.Subject} | каб. {s.Classroom}"
+                TimeSubjectClassroom = $"{s.Time} | {s.Subject}"
             }).ToList();
 
             ScheduleCollection.ItemsSource = items;

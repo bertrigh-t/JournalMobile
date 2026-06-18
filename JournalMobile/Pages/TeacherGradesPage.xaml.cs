@@ -4,6 +4,7 @@ using JournalMobile.Services;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using JournalMobile.Models;
 
 namespace JournalMobile.Pages;
 
@@ -721,40 +722,4 @@ downloadsPath = Android.OS.Environment
 
         await LoadGrades();
     }
-}
-
-public class GroupItem
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-}
-
-public class JournalItem
-{
-    public int Id { get; set; }
-    public string Subject { get; set; } = "";
-}
-public class SemesterItem
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-
-    public string Start_date { get; set; } = "";
-    public string End_date { get; set; } = "";
-}
-public class TeacherGradeItem
-{
-    public int Id { get; set; }
-    public string Student { get; set; } = "";
-    public int Grade { get; set; }
-    public string Date { get; set; } = "";
-
-    public Microsoft.Maui.Graphics.Color GradeColor => Grade switch
-    {
-        5 => Microsoft.Maui.Graphics.Color.FromArgb("#8BC34A"),
-        4 => Microsoft.Maui.Graphics.Color.FromArgb("#CDDC39"),
-        3 => Microsoft.Maui.Graphics.Color.FromArgb("#FFB74D"),
-        2 => Microsoft.Maui.Graphics.Color.FromArgb("#E57373"),
-        _ => Microsoft.Maui.Graphics.Colors.Gray
-    };
 }

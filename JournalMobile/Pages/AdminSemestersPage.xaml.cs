@@ -1,33 +1,36 @@
 using JournalMobile.Services;
 using System.Net.Http.Headers;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
 using JournalMobile.Models;
 
 namespace JournalMobile.Pages;
 
-public partial class AdminUsersPage : ContentPage
+public partial class AdminSemestersPage : ContentPage
 {
     private readonly HttpClient _httpClient = new();
 
-    private List<UserItem> _users = new();
-    public AdminUsersPage()
-	{
-		InitializeComponent();
-	}
+    private List<SemesterItem> _semesters = new();
+
+    public AdminSemestersPage()
+    {
+        InitializeComponent();
+    }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
 
-        await LoadUsers();
+        await LoadSemesters();
     }
-    private async Task LoadUsers()
+
+    private async Task LoadSemesters()
     {
         try
         {
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                "https://localhost:7070/Users"
+                "https://localhost:7070/Semesters"
             );
 
             request.Headers.Authorization =
@@ -51,7 +54,7 @@ public partial class AdminUsersPage : ContentPage
                 return;
             }
 
-            _users = JsonSerializer.Deserialize<List<UserItem>>(
+            _semesters = JsonSerializer.Deserialize<List<SemesterItem>>(
                 json,
                 new JsonSerializerOptions
                 {
@@ -59,7 +62,7 @@ public partial class AdminUsersPage : ContentPage
                 }
             ) ?? new();
 
-            UsersCollection.ItemsSource = _users;
+            SemestersCollection.ItemsSource = _semesters;
         }
         catch (Exception ex)
         {
@@ -70,48 +73,46 @@ public partial class AdminUsersPage : ContentPage
             );
         }
     }
-    private async void OnAddUserClicked(object sender, EventArgs e)
+
+    private async void OnAddSemesterClicked(object sender, EventArgs e)
     {
-        var login = await DisplayPromptAsync(
-            "Новый пользователь",
-            "Введите логин:"
+        var name = await DisplayPromptAsync(
+            "Новый семестр",
+            "Введите название:"
         );
 
-        if (string.IsNullOrWhiteSpace(login))
+        if (string.IsNullOrWhiteSpace(name))
             return;
 
-        var password = await DisplayPromptAsync(
-            "Новый пользователь",
-            "Введите пароль:"
+        var startDate = await DisplayPromptAsync(
+            "Дата начала",
+            "Введите дату начала (ГГГГ-ММ-ДД):"
         );
 
-        if (string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(startDate))
             return;
 
-        var role = await DisplayActionSheet(
-            "Выберите роль",
-            "Отмена",
-            null,
-            "admin",
-            "teacher",
-            "student"
+        var endDate = await DisplayPromptAsync(
+            "Дата окончания",
+            "Введите дату окончания (ГГГГ-ММ-ДД):"
         );
 
-        if (role == "Отмена")
+        if (string.IsNullOrWhiteSpace(endDate))
             return;
 
-        await AddUser(login, password, role);
+        await AddSemester(name, startDate, endDate);
     }
-    private async void OnUserTapped(object sender, TappedEventArgs e)
+
+    private async void OnSemesterTapped(object sender, TappedEventArgs e)
     {
         if (sender is not Border border)
             return;
 
-        if (border.BindingContext is not UserItem user)
+        if (border.BindingContext is not SemesterItem semester)
             return;
 
         var action = await DisplayActionSheet(
-            user.Login,
+            semester.Name,
             "Отмена",
             null,
             "Изменить",
@@ -121,35 +122,29 @@ public partial class AdminUsersPage : ContentPage
         switch (action)
         {
             case "Изменить":
-                await EditUser(user);
+                await EditSemester(semester);
                 break;
 
             case "Удалить":
-                await DeleteUser(user);
+                await DeleteSemester(semester);
                 break;
         }
     }
-    private async Task AddUser(string login, string password, string role)
+
+    private async Task AddSemester(string name, string startDate, string endDate)
     {
         try
         {
             var requestData = new
             {
-                login,
-                password,
-                role
+                name,
+                start_date = startDate,
+                end_date = endDate
             };
 
-            var request = new HttpRequestMessage(
-                HttpMethod.Post,
-                "https://localhost:7070/Users"
-            );
+            var request = new HttpRequestMessage(HttpMethod.Post,"https://localhost:7070/Semesters");
 
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue(
-                    "Bearer",
-                    AuthService.Token
-                );
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             request.Content = new StringContent(
                 JsonSerializer.Serialize(requestData),
@@ -172,7 +167,7 @@ public partial class AdminUsersPage : ContentPage
                 return;
             }
 
-            await LoadUsers();
+            await LoadSemesters();
         }
         catch (Exception ex)
         {
@@ -183,51 +178,56 @@ public partial class AdminUsersPage : ContentPage
             );
         }
     }
-    private async Task EditUser(UserItem user)
+
+    private async Task EditSemester(SemesterItem semester)
     {
-        var login = await DisplayPromptAsync(
-            "Изменение пользователя",
-            "Логин:",
-            initialValue: user.Login
+        var name = await DisplayPromptAsync(
+            "Изменение семестра",
+            "Название:",
+            initialValue: semester.Name
         );
 
-        if (string.IsNullOrWhiteSpace(login))
+        if (string.IsNullOrWhiteSpace(name))
             return;
 
-        var password = await DisplayPromptAsync(
-            "Изменение пользователя",
-            "Новый пароль:"
+        var startDate = await DisplayPromptAsync(
+            "Дата начала",
+            "Введите дату начала:",
+            initialValue: semester.Start_date
         );
 
-        if (string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(startDate))
             return;
 
-        var role = await DisplayActionSheet(
-            "Роль",
-            "Отмена",
-            null,
-            "admin",
-            "teacher",
-            "student"
+        var endDate = await DisplayPromptAsync(
+            "Дата окончания",
+            "Введите дату окончания:",
+            initialValue: semester.End_date
         );
 
-        if (role == "Отмена")
+        if (string.IsNullOrWhiteSpace(endDate))
             return;
 
-        await UpdateUser(user.Id, login, password, role);
+        await UpdateSemester(
+            semester.Id,
+            name,
+            startDate,
+            endDate
+        );
     }
-    private async Task UpdateUser(int id, string login, string password, string role)
+
+    private async Task UpdateSemester(int id, string name, string startDate, string endDate)
     {
         var requestData = new
         {
-            login,
-            password,
-            role
+            name,
+            start_date = startDate,
+            end_date = endDate
         };
 
         var request = new HttpRequestMessage(
             HttpMethod.Put,
-            $"https://localhost:7070/Users/{id}"
+            $"https://localhost:7070/Semesters/{id}"
         );
 
         request.Headers.Authorization =
@@ -245,13 +245,14 @@ public partial class AdminUsersPage : ContentPage
         var response = await _httpClient.SendAsync(request);
 
         if (response.IsSuccessStatusCode)
-            await LoadUsers();
+            await LoadSemesters();
     }
-    private async Task DeleteUser(UserItem user)
+
+    private async Task DeleteSemester(SemesterItem semester)
     {
         bool confirm = await DisplayAlert(
             "Удаление",
-            $"Удалить пользователя {user.Login}?",
+            $"Удалить семестр {semester.Name}?",
             "Да",
             "Нет"
         );
@@ -259,10 +260,7 @@ public partial class AdminUsersPage : ContentPage
         if (!confirm)
             return;
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Delete,
-            $"https://localhost:7070/Users/{user.Id}"
-        );
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"https://localhost:7070/Semesters/{semester.Id}");
 
         request.Headers.Authorization =
             new AuthenticationHeaderValue(
@@ -273,6 +271,6 @@ public partial class AdminUsersPage : ContentPage
         var response = await _httpClient.SendAsync(request);
 
         if (response.IsSuccessStatusCode)
-            await LoadUsers();
+            await LoadSemesters();
     }
 }

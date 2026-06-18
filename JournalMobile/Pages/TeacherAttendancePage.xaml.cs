@@ -4,6 +4,7 @@ using JournalMobile.Services;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using JournalMobile.Models;
 
 namespace JournalMobile.Pages;
 
@@ -11,9 +12,9 @@ public partial class TeacherAttendancePage : ContentPage
 {
     private readonly HttpClient _httpClient = new();
 
-    private List<GroupAttendanceItem> _groups = new();
-    private List<JournalAttendanceItem> _journals = new();
-    private List<SemesterAttendanceItem> _semesters = new();
+    private List<GroupItem> _groups = new();
+    private List<JournalItem> _journals = new();
+    private List<SemesterItem> _semesters = new();
     private List<StudentItem> _students = new();
     private List<string> _dates = new();
 
@@ -60,10 +61,10 @@ public partial class TeacherAttendancePage : ContentPage
                 return;
             }
 
-            _groups = JsonSerializer.Deserialize<List<GroupAttendanceItem>>(
+            _groups = JsonSerializer.Deserialize<List<GroupItem>>(
                 json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? new List<GroupAttendanceItem>();
+            ) ?? new List<GroupItem>();
 
             foreach (var group in _groups)
                 GroupPicker.Items.Add(group.Name);
@@ -107,7 +108,7 @@ public partial class TeacherAttendancePage : ContentPage
                 return;
             }
 
-            _semesters = JsonSerializer.Deserialize<List<SemesterAttendanceItem>>(
+            _semesters = JsonSerializer.Deserialize<List<SemesterItem>>(
                 json,
                 new JsonSerializerOptions
                 {
@@ -216,10 +217,10 @@ public partial class TeacherAttendancePage : ContentPage
                 return;
             }
 
-            _journals = JsonSerializer.Deserialize<List<JournalAttendanceItem>>(
+            _journals = JsonSerializer.Deserialize<List<JournalItem>>(
                 json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? new List<JournalAttendanceItem>();
+            ) ?? new List<JournalItem>();
 
             foreach (var journal in _journals)
                 JournalPicker.Items.Add(journal.Subject);
@@ -747,43 +748,4 @@ public partial class TeacherAttendancePage : ContentPage
 
         await LoadAttendance();
     }
-}
-
-public class GroupAttendanceItem
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-}
-
-public class JournalAttendanceItem
-{
-    public int Id { get; set; }
-    public string Subject { get; set; } = "";
-}
-public class SemesterAttendanceItem
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-
-    public string Start_date { get; set; } = "";
-    public string End_date { get; set; } = "";
-}
-public class TeacherAttendanceItem
-{
-    public int Id { get; set; }
-
-    public string Student { get; set; } = "";
-
-    public string Date { get; set; } = "";
-
-    public string Status { get; set; } = "";
-
-    public Microsoft.Maui.Graphics.Color StatusColor => Status switch
-    {
-        "absent" => Microsoft.Maui.Graphics.Color.FromArgb("#E57373"),
-        "late" => Microsoft.Maui.Graphics.Color.FromArgb("#FFB74D"),
-        "excused" => Microsoft.Maui.Graphics.Color.FromArgb("#90CAF9"),
-        "present" => Microsoft.Maui.Graphics.Color.FromArgb("#8BC34A"),
-        _ => Microsoft.Maui.Graphics.Colors.Gray
-    };
 }

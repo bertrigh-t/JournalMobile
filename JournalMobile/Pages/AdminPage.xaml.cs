@@ -20,6 +20,13 @@ public partial class AdminPage : ContentPage
     {
         await Navigation.PushAsync(new AdminSubjectsPage());
     }
-
+    private async void OnSemestersClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new AdminSemestersPage());
+    }
+    private async void OnScheduleClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new AdminSchedulePage());
+    }
 
 }

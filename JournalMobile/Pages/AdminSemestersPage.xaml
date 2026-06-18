@@ -1,0 +1,66 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JournalMobile.Pages.AdminSemestersPage"
+             Title="Семестры"
+             BackgroundColor="#CFE3FA">
+    <ScrollView>
+        <VerticalStackLayout Padding="20"
+                         Spacing="15">
+
+            <Label Text="Семестры"
+               FontSize="30"
+               FontAttributes="Bold"
+               TextColor="Black"/>
+
+            <Button Text="Добавить семестр"
+                Clicked="OnAddSemesterClicked"
+                BackgroundColor="#7DA8F7"
+                TextColor="Black"
+                CornerRadius="12"/>
+
+            <CollectionView x:Name="SemestersCollection">
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate>
+
+                        <Border BackgroundColor="#EAF3FF"
+                            Stroke="#B7C9DD"
+                            StrokeThickness="1"
+                            Padding="15"
+                            Margin="0,5">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <VerticalStackLayout>
+
+                                <Label Text="{Binding Name}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="Black"/>
+
+                                <Label Text="{Binding PeriodText}"
+                                   FontSize="14"
+                                   TextColor="Gray"/>
+
+                            </VerticalStackLayout>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                Tapped="OnSemesterTapped"/>
+                            </Border.GestureRecognizers>
+
+                        </Border>
+
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
+</ContentPage>

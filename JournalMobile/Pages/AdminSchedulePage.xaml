@@ -1,0 +1,63 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JournalMobile.Pages.AdminSchedulePage"
+             Title="Расписание"
+             BackgroundColor="#CFE3FA">
+
+    <VerticalStackLayout Padding="20" Spacing="12">
+
+        <Label Text="Расписание"
+               FontSize="26"
+               FontAttributes="Bold"/>
+
+        <!-- ФИЛЬТР -->
+        <HorizontalStackLayout Spacing="10">
+
+            <Picker x:Name="GroupPicker"
+                    Title="Группа"
+                    WidthRequest="150"/>
+
+            <Picker x:Name="SemesterPicker"
+                    Title="Семестр"
+                    WidthRequest="200"/>
+
+            <Button Text="Показать"
+                    Clicked="OnLoadClicked"
+                    BackgroundColor="#5E8DF5"
+                    TextColor="White"/>
+        </HorizontalStackLayout>
+
+        <!-- РАСПИСАНИЕ -->
+        <CollectionView x:Name="ScheduleCollection">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5"
+                           Padding="10"
+                           BackgroundColor="White">
+
+                        <VerticalStackLayout>
+
+                            <Label Text="{Binding DayText}"
+                                   TextColor="Black"
+                                   FontAttributes="Bold"
+                                   FontSize="16"/>
+
+                            <Label Text="{Binding TimeSubjectTeacher}"
+                                   TextColor="Black"/>
+
+                        </VerticalStackLayout>
+
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <Button Text="Добавить пару"
+                Clicked="OnAddClicked"
+                BackgroundColor="Green"
+                TextColor="White"/>
+
+    </VerticalStackLayout>
+</ContentPage>

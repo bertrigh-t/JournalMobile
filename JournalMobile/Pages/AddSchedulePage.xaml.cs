@@ -6,7 +6,7 @@ using JournalMobile.Models;
 
 namespace JournalMobile.Pages;
 
-public partial class AdminJournalsPage : ContentPage
+public partial class AddSchedulePage : ContentPage
 {
     private readonly HttpClient _httpClient = new HttpClient();
 
@@ -14,22 +14,29 @@ public partial class AdminJournalsPage : ContentPage
     private List<SubjectItem> _subjects = new();
     private List<TeacherItem> _teachers = new();
     private List<SemesterItem> _semesters = new();
-
-    public AdminJournalsPage()
-    {
-        InitializeComponent();
-    }
-
+    public AddSchedulePage()
+	{
+		InitializeComponent();
+	}
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        DayPicker.ItemsSource = new List<string>
+    {
+        "Понедельник",
+        "Вторник",
+        "Среда",
+        "Четверг",
+        "Пятница",
+        "Суббота"
+    };
 
         await LoadGroups();
         await LoadSubjects();
         await LoadTeachers();
         await LoadSemesters();
     }
-
     private async Task LoadGroups()
     {
         try
@@ -204,15 +211,15 @@ public partial class AdminJournalsPage : ContentPage
             .ToList();
     }
 
-
-    private async void OnCreateJournalClicked(object sender, EventArgs e)
+    private async void OnCreateLessonClicked(object sender, EventArgs e)
     {
         try
         {
             if (
                 GroupPicker.SelectedIndex < 0 ||
                 SubjectPicker.SelectedIndex < 0 ||
-                TeacherPicker.SelectedIndex < 0
+                TeacherPicker.SelectedIndex < 0 ||
+                SemesterPicker.SelectedIndex < 0
             )
             {
                 await DisplayAlert(
@@ -227,17 +234,20 @@ public partial class AdminJournalsPage : ContentPage
             var selectedGroup = _groups[GroupPicker.SelectedIndex];
             var selectedSubject = _subjects[SubjectPicker.SelectedIndex];
             var selectedTeacher = _teachers[TeacherPicker.SelectedIndex];
+            var selectedSemester = _semesters[SemesterPicker.SelectedIndex];
 
             var requestData = new
             {
                 groupId = selectedGroup.Id,
                 subjectId = selectedSubject.Id,
-                userId = selectedTeacher.Id
+                teacherId = selectedTeacher.Id,
+                semesterId = selectedSemester.Id,
+                dayOfWeek = GetDayNumber(DayPicker.SelectedItem!.ToString()),
             };
 
             var request = new HttpRequestMessage(
                 HttpMethod.Post,
-                "https://localhost:7070/Admin/journals"
+                "https://localhost:7070/Schedule"
             );
 
             request.Headers.Authorization =
@@ -278,5 +288,18 @@ public partial class AdminJournalsPage : ContentPage
                 "OK"
             );
         }
+    }
+    private int GetDayNumber(string day)
+    {
+        return day switch
+        {
+            "Понедельник" => 1,
+            "Вторник" => 2,
+            "Среда" => 3,
+            "Четверг" => 4,
+            "Пятница" => 5,
+            "Суббота" => 6,
+            _ => 1
+        };
     }
 }

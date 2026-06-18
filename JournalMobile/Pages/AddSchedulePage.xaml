@@ -1,8 +1,8 @@
 <ContentPage
-    x:Class="JournalMobile.Pages.AdminJournalsPage"
+    x:Class="JournalMobile.Pages.AddSchedulePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Управление журналами"
+    Title="Добавить пару"
     BackgroundColor="#F4F6FB">
 
     <ScrollView>
@@ -24,18 +24,6 @@
                 Padding="18">
 
                 <VerticalStackLayout Spacing="16">
-
-                    <Label
-                        Text="Группа"
-                        FontSize="16"
-                        FontAttributes="Bold"
-                        TextColor="#334155" />
-
-                    <Picker
-                        x:Name="GroupPicker"
-                        Title="Выберите группу"
-                        BackgroundColor="#F8FAFC"
-                        TextColor="Black" />
 
                     <Label
                         Text="Предмет"
@@ -67,21 +55,42 @@
                         FontAttributes="Bold"
                         TextColor="#334155" />
 
-
                     <Picker 
                         x:Name="SemesterPicker"
                         Title="Выберите семестр"
                         BackgroundColor="White"
                         TextColor="Black" />
+                    <Label
+                        Text="Группа"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+
+                    <Picker 
+                        x:Name="GroupPicker"
+                        Title="Выберите семестр"
+                        BackgroundColor="White"
+                        TextColor="Black" />
+                    <Label
+                        Text="День недели"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+
+                    <Picker 
+                        x:Name="DayPicker"
+                        Title="Выберите семестр"
+                        BackgroundColor="White"
+                        TextColor="Black" />
 
                     <Button
-                        Text="Создать журнал"
+                        Text="Создать пару"
                         HeightRequest="52"
                         CornerRadius="14"
                         BackgroundColor="#4F46E5"
                         TextColor="White"
-                        FontAttributes="Bold"
-                        Clicked="OnCreateJournalClicked" />
+                        Clicked="OnCreateLessonClicked"
+                        FontAttributes="Bold"/>
 
                 </VerticalStackLayout>
 

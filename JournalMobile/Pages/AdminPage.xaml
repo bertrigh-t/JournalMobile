@@ -35,8 +35,18 @@
                         TextColor="White"
                         CornerRadius="12"
                         HeightRequest="50"/>
-
-
+                <Button Text="Семестры"
+                        Clicked="OnSemestersClicked"
+                        BackgroundColor="#91C483"
+                        TextColor="White"
+                        CornerRadius="12"
+                        HeightRequest="50"/>
+                <Button Text="Расписание"
+                        Clicked="OnScheduleClicked"
+                        BackgroundColor="#91C483"
+                        TextColor="White"
+                        CornerRadius="12"
+                        HeightRequest="50"/>
             </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

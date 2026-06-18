@@ -2,6 +2,8 @@ using JournalMobile.Services;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text;
+using JournalMobile.Models;
+
 
 namespace JournalMobile.Pages;
 
@@ -9,7 +11,7 @@ public partial class AdminSubjectsPage : ContentPage
 {
     private readonly HttpClient _httpClient = new();
     private List<SubjectItem> _subjects = new();
-    private List<UserSubjectItem> _teachers = new();
+    private List<SubjectItem> _teachers = new();
     private List<TeacherSubjectItem> _teacherSubjects = new();
     public AdminSubjectsPage()
     {
@@ -27,19 +29,10 @@ public partial class AdminSubjectsPage : ContentPage
     {
         try
         {
-            var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                "https://localhost:7070/Subject"
-            );
-
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue(
-                    "Bearer",
-                    AuthService.Token
-                );
+            var request = new HttpRequestMessage(HttpMethod.Get,"https://localhost:7070/Subject");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",AuthService.Token);
 
             var response = await _httpClient.SendAsync(request);
-
             var json = await response.Content.ReadAsStringAsync();
             System.Diagnostics.Debug.WriteLine($"Response JSON: {json}");
 
@@ -55,24 +48,15 @@ public partial class AdminSubjectsPage : ContentPage
                 return;
             }
 
-            _subjects = JsonSerializer.Deserialize<List<SubjectItem>>(
-                json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            ) ?? new();
+            _subjects = JsonSerializer.Deserialize<List<SubjectItem>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
 
             if (!response.IsSuccessStatusCode)
             {
-                await DisplayAlert(
-                    "Ошибка",
-                    json,
-                    "OK"
-                );
-
+                await DisplayAlert("Ошибка",json,"OK");
                 return;
             }
 
-            _subjects = JsonSerializer.Deserialize<List<SubjectItem>>(
-                json,
+            _subjects = JsonSerializer.Deserialize<List<SubjectItem>>(json,
                 new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
@@ -84,24 +68,20 @@ public partial class AdminSubjectsPage : ContentPage
 
         catch (Exception ex)
         {
-            await DisplayAlert(
-                "Ошибка",
-                ex.Message,
-                "OK"
-            );
+            await DisplayAlert("Ошибка",ex.Message,"OK");
         }
     }
     private async Task LoadTeachers()
     {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7070/Users/teachers");
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7070/Admin/teachers");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await _httpClient.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
 
-            _teachers = JsonSerializer.Deserialize<List<UserSubjectItem>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+            _teachers = JsonSerializer.Deserialize<List<SubjectItem>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
             TeacherPicker.ItemsSource = _teachers.Select(t => t.Name).ToList();
             if (_teachers.Count > 0) TeacherPicker.SelectedIndex = 0;
         }
@@ -345,22 +325,4 @@ public partial class AdminSubjectsPage : ContentPage
             await LoadSubjects();
     }
 }
-public class SubjectItem
-{
-    public int Id { get; set; }
 
-    public string Name { get; set; } = "";
-
-}
-public class UserSubjectItem
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-}
-
-public class TeacherSubjectItem
-{
-    public int Id { get; set; }
-    public int SubjectId { get; set; }
-    public string Name { get; set; } = "";
-}
