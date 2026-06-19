@@ -18,6 +18,7 @@ public class ScheduleItem
         _ => "Неизвестно"
     };
     public string Time { get; set; } = "";
+    public int Number { get; set; }
     public string Subject { get; set; } = "";
     public string Group { get; set; } = "";
     public string Teacher { get; set; } = "";

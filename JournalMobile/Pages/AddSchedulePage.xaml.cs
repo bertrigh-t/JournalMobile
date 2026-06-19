@@ -17,7 +17,9 @@ public partial class AddSchedulePage : ContentPage
     public AddSchedulePage()
 	{
 		InitializeComponent();
-	}
+        for (int i = 1; i <= 5; i++)
+            NumberPicker.Items.Add(i.ToString());
+    }
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -219,7 +221,9 @@ public partial class AddSchedulePage : ContentPage
                 GroupPicker.SelectedIndex < 0 ||
                 SubjectPicker.SelectedIndex < 0 ||
                 TeacherPicker.SelectedIndex < 0 ||
-                SemesterPicker.SelectedIndex < 0
+                SemesterPicker.SelectedIndex < 0 ||
+                NumberPicker.SelectedIndex < 0 ||
+                DayPicker.SelectedIndex < 0
             )
             {
                 await DisplayAlert(
@@ -235,6 +239,7 @@ public partial class AddSchedulePage : ContentPage
             var selectedSubject = _subjects[SubjectPicker.SelectedIndex];
             var selectedTeacher = _teachers[TeacherPicker.SelectedIndex];
             var selectedSemester = _semesters[SemesterPicker.SelectedIndex];
+            int number = int.Parse(NumberPicker.Items[NumberPicker.SelectedIndex]);
 
             var requestData = new
             {
@@ -243,6 +248,8 @@ public partial class AddSchedulePage : ContentPage
                 teacherId = selectedTeacher.Id,
                 semesterId = selectedSemester.Id,
                 dayOfWeek = GetDayNumber(DayPicker.SelectedItem!.ToString()),
+                number = number
+
             };
 
             var request = new HttpRequestMessage(

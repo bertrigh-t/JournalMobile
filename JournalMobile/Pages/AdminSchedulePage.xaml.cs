@@ -97,10 +97,15 @@ public partial class AdminSchedulePage : ContentPage
         var items = _schedule.Select(s => new ScheduleGroupItem
         {
             DayText = TranslateDay(s.DayOfWeek),
-            TimeSubjectTeacher = $"{s.Time} | {s.Subject} | {s.Teacher}"
+            NumberTimeSubjectTeacher = $"¹{s.Number} {s.Time} | {s.Subject} | {s.Teacher}"
         }).ToList();
+        var groups = _schedule
+        .GroupBy(s => s.DayOfWeek)
+        .OrderBy(g => g.Key)
+        .Select(g => new ScheduleDayGroup(g.Key, g.OrderBy(s => s.Number)))
+        .ToList();
 
-        ScheduleCollection.ItemsSource = items;
+        ScheduleCollection.ItemsSource = groups;
     }
 
     private string TranslateDay(int day)
@@ -124,5 +129,5 @@ public partial class AdminSchedulePage : ContentPage
 public class ScheduleGroupItem
 {
     public string DayText { get; set; } = "";
-    public string TimeSubjectTeacher { get; set; } = "";
+    public string NumberTimeSubjectTeacher { get; set; } = "";
 }

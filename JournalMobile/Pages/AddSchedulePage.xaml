@@ -72,11 +72,20 @@
                         BackgroundColor="White"
                         TextColor="Black" />
                     <Label
+                        Text="Номер пары"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+                    <Picker 
+                        x:Name="NumberPicker"
+                        Title="Выберите семестр"
+                        BackgroundColor="White"
+                        TextColor="Black" />
+                    <Label
                         Text="День недели"
                         FontSize="16"
                         FontAttributes="Bold"
                         TextColor="#334155" />
-
                     <Picker 
                         x:Name="DayPicker"
                         Title="Выберите семестр"
