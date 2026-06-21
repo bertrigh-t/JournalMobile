@@ -3,11 +3,13 @@
              x:Class="JournalMobile.Pages.AdminUsersPage"
              BackgroundColor="#CFE3FA"
              Title="Пользователи">
+    
 
     <VerticalStackLayout Padding="20"
                          Spacing="15">
 
         <Label Text="Пользователи"
+               TextColor="Black"
                FontSize="30"
                FontAttributes="Bold"/>
 
@@ -15,7 +17,20 @@
                 Clicked="OnAddUserClicked"
                 BackgroundColor="#7DA8F7"
                 TextColor="Black"/>
+        <Entry
+                x:Name="SearchEntry"
+                Placeholder="Поиск..."
+                TextChanged="OnSearchChanged" />
 
+        <Picker
+                x:Name="RoleFilterPicker"
+                Title="Роль"
+                SelectedIndexChanged="OnRoleFilterChanged" />
+
+        <Picker
+                x:Name="SortPicker"
+                Title="Сортировка"
+                SelectedIndexChanged="OnSortChanged" />
         <CollectionView x:Name="UsersCollection">
 
             <CollectionView.ItemTemplate>
@@ -33,10 +48,17 @@
                         <VerticalStackLayout>
 
                             <Label Text="{Binding Login}"
+                            TextColor="Black"
+                            FontAttributes="Bold"
+                                   FontSize="18"/>
+                            <Label Text="{Binding Name}"
+                                   TextColor="Black"
                                    FontAttributes="Bold"
                                    FontSize="18"/>
 
-                            <Label Text="{Binding Role}" />
+                            <Label Text="{Binding Role}" 
+                            TextColor="Black"/>
+
 
                         </VerticalStackLayout>
 

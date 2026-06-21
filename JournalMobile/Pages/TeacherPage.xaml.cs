@@ -1,6 +1,8 @@
 using JournalMobile.Services;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using JournalMobile.Models;
+
 
 namespace JournalMobile.Pages;
 
@@ -70,11 +72,6 @@ public partial class TeacherPage : ContentPage
     }
 }
 
-public class StudentItem
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-}
 public class TeacherScheduleItem
 {
     public string Subject { get; set; } = "";

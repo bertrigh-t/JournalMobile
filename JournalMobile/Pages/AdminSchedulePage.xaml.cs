@@ -14,7 +14,8 @@ public partial class AdminSchedulePage : ContentPage
     private List<SemesterItem> _semesters = new();
 
     private List<ScheduleItem> _schedule = new();
-
+    private int _currentGroupId;
+    private int _currentSemesterId;
     public AdminSchedulePage()
     {
         InitializeComponent();
@@ -76,6 +77,8 @@ public partial class AdminSchedulePage : ContentPage
 
         var groupId = _groups[GroupPicker.SelectedIndex].Id;
         var semesterId = _semesters[SemesterPicker.SelectedIndex].Id;
+        _currentGroupId = groupId;
+        _currentSemesterId = semesterId;
 
         await LoadSchedule(groupId, semesterId);
     }
@@ -124,6 +127,57 @@ public partial class AdminSchedulePage : ContentPage
     private async void OnAddClicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new AddSchedulePage());
+    }
+    private async void OnLessonTapped (object sender, TappedEventArgs e)
+    {
+        if (sender is not Frame frame)
+            return;
+
+        if (frame.BindingContext is not ScheduleItem item)
+            return;
+
+        var action = await DisplayActionSheet(
+            $"{item.Subject} ({item.Time})",
+            "Отмена",
+            null,
+            "Изменить",
+            "Удалить"
+        );
+
+        switch (action)
+        {
+            case "Удалить":
+                await DeleteLesson(item);
+                break;
+        }
+    }
+    private async Task DeleteLesson(ScheduleItem item)
+    {
+        bool confirm = await DisplayAlert(
+            "Удаление",
+            $"Удалить предмет? {item.Subject}?",
+            "Да",
+            "Нет"
+        );
+
+        if (!confirm)
+            return;
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Delete,
+            $"https://localhost:7070/Schedule/{item.Id}"
+        );
+
+        request.Headers.Authorization =
+            new AuthenticationHeaderValue(
+                "Bearer",
+                AuthService.Token
+            );
+
+        var response = await _httpClient.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+            await LoadSchedule(_currentGroupId, _currentSemesterId);
     }
 }
 public class ScheduleGroupItem

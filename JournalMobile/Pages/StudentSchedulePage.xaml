@@ -16,22 +16,36 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Border BackgroundColor="#EAF3FF"
-                                Stroke="#B7C9DD"
-                                StrokeThickness="1"
-                                Padding="14"
-                                Margin="0,6">
+            Stroke="#B7C9DD"
+            StrokeThickness="1"
+            Padding="14"
+            Margin="0,6">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="16" />
                             </Border.StrokeShape>
 
                             <VerticalStackLayout Spacing="8">
-                                <Label Text="{Binding DayOfWeekText}"
-                                       FontSize="20"
-                                       FontAttributes="Bold"
-                                       TextColor="#1B3A57" />
-                                <Label Text="{Binding TimeSubjectClassroom}"
-                                       FontSize="16"
-                                       TextColor="#333333" />
+                                <Label Text="{Binding DayName}"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   TextColor="#1B3A57" />
+
+                                <Label Text="{Binding Number, StringFormat='Пара {0}'}"
+                   FontSize="15"
+                   TextColor="#333333" />
+
+                                <Label Text="{Binding Time}"
+                   FontSize="15"
+                   TextColor="#333333" />
+
+                                <Label Text="{Binding Subject}"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="Black" />
+
+                                <Label Text="{Binding Teacher}"
+                   FontSize="14"
+                   TextColor="#555555" />
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>

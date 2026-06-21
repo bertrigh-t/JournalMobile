@@ -11,6 +11,7 @@ public partial class AdminUsersPage : ContentPage
     private readonly HttpClient _httpClient = new();
 
     private List<UserItem> _users = new();
+    private List<UserItem> _filteredUsers = new();
     public AdminUsersPage()
 	{
 		InitializeComponent();
@@ -20,6 +21,63 @@ public partial class AdminUsersPage : ContentPage
         base.OnAppearing();
 
         await LoadUsers();
+        RoleFilterPicker.ItemsSource = new List<string>
+            {
+                "Все",
+                "admin",
+                "teacher",
+                "student"
+            };
+
+        SortPicker.ItemsSource = new List<string>
+            {
+                "По логину A-Z",
+                "По логину Z-A"
+            };
+
+        RoleFilterPicker.SelectedIndex = 0;
+        SortPicker.SelectedIndex = 0;
+    }
+    private void OnSearchChanged(object sender, TextChangedEventArgs e)
+    {
+        ApplyFilters();
+    }
+
+    private void OnRoleFilterChanged(object sender, EventArgs e)
+    {
+        ApplyFilters();
+    }
+
+    private void OnSortChanged(object sender, EventArgs e)
+    {
+        ApplyFilters();
+    }
+    private void ApplyFilters()
+    {
+        IEnumerable<UserItem> result = _users;
+
+        var search = SearchEntry.Text?.ToLower();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            result = result.Where(x =>
+                x.Login.ToLower().Contains(search)
+            );
+        }
+        if (RoleFilterPicker.SelectedIndex > 0)
+        {
+            var role = RoleFilterPicker.SelectedItem.ToString();
+
+            result = result.Where(x => x.Role == role);
+        }
+        if (SortPicker.SelectedIndex == 0)
+            result = result.OrderBy(x => x.Login);
+
+        else if (SortPicker.SelectedIndex == 1)
+            result = result.OrderByDescending(x => x.Login);
+        _filteredUsers = result.ToList();
+
+        UsersCollection.ItemsSource = _filteredUsers;
     }
     private async Task LoadUsers()
     {
@@ -59,7 +117,7 @@ public partial class AdminUsersPage : ContentPage
                 }
             ) ?? new();
 
-            UsersCollection.ItemsSource = _users;
+            ApplyFilters();
         }
         catch (Exception ex)
         {
@@ -99,8 +157,14 @@ public partial class AdminUsersPage : ContentPage
 
         if (role == "Отмена")
             return;
+        var name = await DisplayPromptAsync(
+            "Новое имя",
+            "Введите фамилию и имя:"
+            );
+        if (string.IsNullOrWhiteSpace(name))
+            return;
 
-        await AddUser(login, password, role);
+        await AddUser(login, password, role, name);
     }
     private async void OnUserTapped(object sender, TappedEventArgs e)
     {
@@ -129,7 +193,7 @@ public partial class AdminUsersPage : ContentPage
                 break;
         }
     }
-    private async Task AddUser(string login, string password, string role)
+    private async Task AddUser(string login, string password, string role, string name)
     {
         try
         {
@@ -137,7 +201,8 @@ public partial class AdminUsersPage : ContentPage
             {
                 login,
                 password,
-                role
+                role,
+                name
             };
 
             var request = new HttpRequestMessage(
@@ -214,15 +279,24 @@ public partial class AdminUsersPage : ContentPage
         if (role == "Отмена")
             return;
 
-        await UpdateUser(user.Id, login, password, role);
+        var name = await DisplayPromptAsync(
+            "Изменение пользователя",
+            "Имя (ФИО):"
+        );
+
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
+        await UpdateUser(user.Id, login, password, role, name);
     }
-    private async Task UpdateUser(int id, string login, string password, string role)
+    private async Task UpdateUser(int id, string login, string password, string role, string name)
     {
         var requestData = new
         {
             login,
             password,
-            role
+            role,
+            name
         };
 
         var request = new HttpRequestMessage(
@@ -231,10 +305,7 @@ public partial class AdminUsersPage : ContentPage
         );
 
         request.Headers.Authorization =
-            new AuthenticationHeaderValue(
-                "Bearer",
-                AuthService.Token
-            );
+            new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
         request.Content = new StringContent(
             JsonSerializer.Serialize(requestData),
@@ -244,8 +315,15 @@ public partial class AdminUsersPage : ContentPage
 
         var response = await _httpClient.SendAsync(request);
 
-        if (response.IsSuccessStatusCode)
-            await LoadUsers();
+        var json = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            await DisplayAlert("Ошибка", json, "OK");
+            return;
+        }
+
+        await LoadUsers();
     }
     private async Task DeleteUser(UserItem user)
     {

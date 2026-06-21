@@ -7,7 +7,7 @@ namespace JournalMobile.Pages;
 
 public partial class StudentSchedulePage : ContentPage
 {
-    private readonly HttpClient _httpClient = new HttpClient();
+    private readonly HttpClient _httpClient = new();
 
     public StudentSchedulePage()
     {
@@ -17,74 +17,124 @@ public partial class StudentSchedulePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadSchedule();
+        await LoadStudentSchedule();
     }
 
-    private async Task LoadSchedule()
+    private async Task LoadStudentSchedule()
     {
-        ScheduleCollection.ItemsSource = null;
-
         try
         {
-            var request = new HttpRequestMessage(
+            ScheduleCollection.ItemsSource = null;
+
+            // 1. Получаем текущего студента
+            var studentRequest = new HttpRequestMessage(
                 HttpMethod.Get,
-                "https://localhost:7070/Schedule/student"
+                "https://localhost:7070/Students/me"
             );
 
-            request.Headers.Authorization =
+            studentRequest.Headers.Authorization =
                 new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-            var response = await _httpClient.SendAsync(request);
-            var json = await response.Content.ReadAsStringAsync();
+            var studentResponse = await _httpClient.SendAsync(studentRequest);
+            var studentJson = await studentResponse.Content.ReadAsStringAsync();
 
-            if (!response.IsSuccessStatusCode)
+            if (!studentResponse.IsSuccessStatusCode)
             {
-                await DisplayAlert("Ошибка", $"{response.StatusCode}\n{json}", "OK");
+                await DisplayAlert(
+                    "Ошибка студента",
+                    $"{studentResponse.StatusCode}\n{studentJson}",
+                    "OK"
+                );
+                return;
+            }
+
+            var student = JsonSerializer.Deserialize<StudentItem>(
+                studentJson,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                }
+            );
+
+            if (student == null)
+            {
+                await DisplayAlert(
+                    "Ошибка",
+                    "Не удалось загрузить данные студента",
+                    "OK"
+                );
+                return;
+            }
+
+            if (student.GroupId == 0)
+            {
+                await DisplayAlert(
+                    "Ошибка",
+                    "У студента не указана группа",
+                    "OK"
+                );
+                return;
+            }
+
+            // 2. Получаем расписание по groupId
+            var scheduleRequest = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"https://localhost:7070/Schedule/group/{student.GroupId}"
+            );
+
+            scheduleRequest.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var scheduleResponse = await _httpClient.SendAsync(scheduleRequest);
+            var scheduleJson = await scheduleResponse.Content.ReadAsStringAsync();
+
+            if (!scheduleResponse.IsSuccessStatusCode)
+            {
+                await DisplayAlert(
+                    "Ошибка расписания",
+                    $"{scheduleResponse.StatusCode}\n{scheduleJson}",
+                    "OK"
+                );
                 return;
             }
 
             var schedule = JsonSerializer.Deserialize<List<ScheduleItem>>(
-                json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            );
+                scheduleJson,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                }
+            ) ?? new List<ScheduleItem>();
 
-            if (schedule == null || schedule.Count == 0)
+            if (schedule.Count == 0)
             {
-                await DisplayAlert("Расписание", "Расписание отсутствует", "OK");
+                await DisplayAlert(
+                    "Расписание",
+                    "Для вашей группы пока нет расписания",
+                    "OK"
+                );
                 return;
             }
 
-            var items = schedule.Select(s => new ScheduleDisplayItem
-            {
-                DayOfWeekText = TranslateDay(s.DayOfWeek),
-                TimeSubjectClassroom = $"{s.Time} | {s.Subject}"
-            }).ToList();
-
-            ScheduleCollection.ItemsSource = items;
+            ScheduleCollection.ItemsSource = schedule
+                .OrderBy(x => x.DayOfWeek)
+                .ThenBy(x => x.Number)
+                .ToList();
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка подключения", ex.Message, "OK");
+            await DisplayAlert(
+                "Ошибка",
+                ex.Message,
+                "OK"
+            );
         }
     }
-
-    private string TranslateDay(int day)
-    {
-        return day switch
-        {
-            1 => "Понедельник",
-            2 => "Вторник",
-            3 => "Среда",
-            4 => "Четверг",
-            5 => "Пятница",
-            6 => "Суббота",
-            _ => "Неизвестно"
-        };
-    }
 }
-
-public class ScheduleDisplayItem
+public class StudentItem
 {
-    public string DayOfWeekText { get; set; } = "";
-    public string TimeSubjectClassroom { get; set; } = "";
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public int GroupId { get; set; }
+    public int UserId { get; set; }
 }

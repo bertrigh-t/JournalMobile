@@ -51,6 +51,10 @@
                     <Frame Margin="5"
                    Padding="10"
                    BackgroundColor="White">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnLessonTapped" />
+                        </Frame.GestureRecognizers>
+
                         <VerticalStackLayout>
                             <HorizontalStackLayout Spacing="5">
                                 <Label Text="{Binding Number, StringFormat='Пара №{0}'}"

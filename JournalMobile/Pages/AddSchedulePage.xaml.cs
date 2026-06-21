@@ -17,7 +17,7 @@ public partial class AddSchedulePage : ContentPage
     public AddSchedulePage()
 	{
 		InitializeComponent();
-        for (int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 6; i++)
             NumberPicker.Items.Add(i.ToString());
     }
     protected override async void OnAppearing()
@@ -223,7 +223,8 @@ public partial class AddSchedulePage : ContentPage
                 TeacherPicker.SelectedIndex < 0 ||
                 SemesterPicker.SelectedIndex < 0 ||
                 NumberPicker.SelectedIndex < 0 ||
-                DayPicker.SelectedIndex < 0
+                DayPicker.SelectedIndex < 0 ||
+                NumberPicker.SelectedIndex < 0
             )
             {
                 await DisplayAlert(
@@ -239,7 +240,9 @@ public partial class AddSchedulePage : ContentPage
             var selectedSubject = _subjects[SubjectPicker.SelectedIndex];
             var selectedTeacher = _teachers[TeacherPicker.SelectedIndex];
             var selectedSemester = _semesters[SemesterPicker.SelectedIndex];
-            int number = int.Parse(NumberPicker.Items[NumberPicker.SelectedIndex]);
+            int dayOfWeek = GetDayNumber(DayPicker.SelectedItem!.ToString()!);
+            int lessonNumber = int.Parse(NumberPicker.SelectedItem!.ToString()!);
+            string lessonTime = GetLessonTime(dayOfWeek, lessonNumber);
 
             var requestData = new
             {
@@ -248,7 +251,8 @@ public partial class AddSchedulePage : ContentPage
                 teacherId = selectedTeacher.Id,
                 semesterId = selectedSemester.Id,
                 dayOfWeek = GetDayNumber(DayPicker.SelectedItem!.ToString()),
-                number = number
+                number = lessonNumber,
+                time = lessonTime
 
             };
 
@@ -295,6 +299,35 @@ public partial class AddSchedulePage : ContentPage
                 "OK"
             );
         }
+    }
+    private string GetLessonTime(int dayOfWeek, int lessonNumber)
+    {
+        // ÏÎÍÅÄÅËÜÍÈÊ — îòäåëüíîå ðàñïèñàíèå
+        if (dayOfWeek == 1)
+        {
+            return lessonNumber switch
+            {
+                1 => "08:45-10:05",
+                2 => "10:15-11:35",
+                3 => "12:45-14:05",
+                4 => "14:15-15:35",
+                5 => "15:45-17:05",
+                6 => "17:15-18:15",
+                _ => ""
+            };
+        }
+
+        // ÂÑÅ ÎÑÒÀËÜÍÛÅ ÄÍÈ
+        return lessonNumber switch
+        {
+            1 => "08:00-09:20",
+            2 => "09:30-10:50",
+            3 => "11:10-12:30",
+            4 => "13:30-14:50",
+            5 => "15:00-16:20",
+            6 => "16:30-17:50",
+            _ => ""
+        };
     }
     private int GetDayNumber(string day)
     {
